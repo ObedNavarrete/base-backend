@@ -1,5 +1,6 @@
 package com.security.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.Set;
@@ -10,5 +11,18 @@ public class UserLimDTO {
     private String phone;
     private String email;
     private Boolean enabled;
+
+    @JsonIgnore
     private Set<RoleDTO> roles;
+
+    private String[] rolesName;
+    public String[] getRolesName() {
+        String[] rolesName = new String[roles.size()];
+        int i = 0;
+        for (RoleDTO role : roles) {
+            rolesName[i] = role.getName();
+            i++;
+        }
+        return rolesName;
+    }
 }

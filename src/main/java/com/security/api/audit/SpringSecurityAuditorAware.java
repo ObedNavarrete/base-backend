@@ -32,25 +32,4 @@ public class SpringSecurityAuditorAware implements AuditorAware<User> {
         User currentUser = repo.findById(userId).orElseThrow();
         return Optional.of(currentUser);
     }
-
-    private String getClientIp() {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-
-        // devolver solo una ip en caso de que venga una lista
-        if (ip != null && ip.contains(",")) {
-            ip = ip.split(",")[0];
-        }
-
-        return ip;
-    }
-
 }

@@ -7,6 +7,7 @@ import com.security.api.configSecurity.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -61,14 +62,16 @@ public class AuthenticationService {
         );
 
         var user = repository.findByEmailOrPhone(request.getEmailOrPhone(), request.getEmailOrPhone())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(
+                        // response json Body with bad credentials
+                        () -> new UsernameNotFoundException("Bad credentials")
+                );
 
         Map<String, Object> claims = Map.of(
                 "roles", user.getRoles().stream().map(Role::getName).toArray(),
                 "id", user.getId(),
-                "name", user.getName() != null ? user.getName() : "Obed",
-                "phone", user.getPhone() != null ? user.getPhone() : "123456789",
-                "email", user.getEmail() != null ? user.getEmail() : "nd@gmail"
+                "name", user.getName() != null ? user.getName() : "",
+                "emailOrPhone", user.getPhone() != null ? user.getPhone() : user.getEmail() != null ? user.getEmail() : ""
         );
 
         var jwtToken = jwtService.generateToken(claims, user);

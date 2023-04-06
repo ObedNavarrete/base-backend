@@ -15,4 +15,5 @@ public interface UserMapper {
     List<UserDTO> toDTO(List<User> users);
 
     UserLimDTO toUserLimDTO(User user);
+    List<UserLimDTO> toUserLimDTO(List<User> users);
 }
