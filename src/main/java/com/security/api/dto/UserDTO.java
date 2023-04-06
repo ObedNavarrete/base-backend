@@ -19,6 +19,4 @@ public class UserDTO {
     private Boolean enabled;
     @NotNull(message = "The password is required")
     private String password;
-    @NotNull(message = "The roles are required")
-    private Set<RoleDTO> roles;
 }

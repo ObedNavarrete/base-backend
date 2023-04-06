@@ -1,20 +1,17 @@
 package com.security.api.util;
 
 import com.security.api.configSecurity.User;
-import com.security.api.dto.UserLimDTO;
 import com.security.api.mapper.UserMapper;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Utilities {
-    @Autowired
-    UserMapper uMapper;
-
-    @Autowired
-    HttpServletRequest request;
+    @Autowired HttpServletRequest request;
 
     public String getClassName(Object object) {
         String[] parts = object.getClass().getName().split("\\.");
@@ -60,6 +57,21 @@ public class Utilities {
             return user;
         }
         return null;
+    }
+
+    public Boolean userLogguedHasRole(String role) {
+        User user = getLoggedUser();
+        if (user != null) {
+            return user.getRoles().stream().anyMatch(r -> r.getName().equals(role));
+        }
+        return false;
+    }
+
+    public Boolean userHasRole(User user, String role) {
+        if (user != null) {
+            return user.getRoles().stream().anyMatch(r -> r.getName().equals(role));
+        }
+        return false;
     }
 
     public String getClientIp() {

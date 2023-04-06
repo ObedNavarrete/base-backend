@@ -6,7 +6,6 @@ import com.security.api.util.GeneralResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +15,23 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
     @GetMapping
     public ResponseEntity<GeneralResponse> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<GeneralResponse> save(@RequestBody @Valid UserDTO user) {
-        return ResponseEntity.ok(userService.save(user));
+    public ResponseEntity<GeneralResponse> save(@RequestBody @Valid UserDTO user, @RequestParam String role) {
+        return ResponseEntity.ok(userService.save(user, role));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<GeneralResponse> update(@RequestBody @Valid UserDTO user, @PathVariable Integer id) {
+        return ResponseEntity.ok(userService.update(user, id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<GeneralResponse> delete(@PathVariable Integer id) {
+        return ResponseEntity.ok(userService.delete(id));
     }
 }
