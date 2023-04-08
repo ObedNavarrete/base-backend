@@ -16,7 +16,7 @@ import java.time.ZoneId;
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 @Getter @Setter
-public abstract class AuditableEntity<U> {
+public abstract class AuditableEntity {
     protected boolean pasive = false;
 
     @CreatedBy

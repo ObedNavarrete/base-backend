@@ -1,7 +1,6 @@
 package com.security.api.util;
 
 import com.security.api.configSecurity.User;
-import com.security.api.mapper.UserMapper;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -100,11 +100,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ArrayStoreException.class)
-    public GeneralResponse handleException(ArrayStoreException e) {
-        return utilities.exceptionResponse("Error", e);
-    }
-
-    @ExceptionHandler(InterruptedException.class)
     public GeneralResponse handleException(InterruptedException e) {
         return utilities.exceptionResponse("Error", e);
     }
@@ -121,7 +116,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public final ResponseEntity<GeneralResponse> handleAccessDeniedException(Exception ex, WebRequest request) {
-        return ResponseEntity.status(403).body(utilities.exceptionResponse("Unauthorized", ex));
+        return ResponseEntity.status(401).body(utilities.exceptionResponse("Unauthorized", ex));
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
@@ -147,13 +142,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             WebRequest request) {
         // Personalize handleHttpRequestMethodNotSupported
         return ResponseEntity.badRequest().body(utilities.errorResponse(ex.getMessage()));
-        /*String comentario = ex.getBindingResult().getFieldErrors().stream()
-                .map(x -> "FATAL ERROR: Column '" + x.getField() + "' => " + x.getDefaultMessage().toLowerCase(Locale.ROOT))
-                .collect(Collectors.joining(", "));
-
-        return ResponseEntity.ok(utilities.errorResponse(comentario));*/
     }
-
     /*@Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException ex,

@@ -64,6 +64,6 @@ public class User extends AuditableEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return Boolean.TRUE.equals(this.enabled) && !this.pasive;
+        return Boolean.TRUE.equals((this.enabled) && !this.pasive);
     }
 }
