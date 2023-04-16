@@ -7,6 +7,7 @@ import java.util.Set;
 
 @Data
 public class UserLimDTO {
+    private Integer id;
     private String name;
     private String phone;
     private String email;

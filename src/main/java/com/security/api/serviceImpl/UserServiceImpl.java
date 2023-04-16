@@ -5,6 +5,7 @@ import com.security.api.auth.base.RoleRepository;
 import com.security.api.auth.base.User;
 import com.security.api.auth.base.UserRepository;
 import com.security.api.dto.UserDTO;
+import com.security.api.dto.UserRoleDTO;
 import com.security.api.mapper.UserMapper;
 import com.security.api.service.UserService;
 import com.security.api.util.GeneralResponse;
@@ -114,7 +115,7 @@ public class UserServiceImpl implements UserService {
         log.info("Deleting user with id: {}", id);
         Optional<User> userToDelete = repository.findByPasiveIsFalseAndId(id);
         if (userToDelete.isEmpty()) {
-            log.info("User not found");
+            log.info("User with id: {} not found for delete", id);
             return util.errorResponse("User not found");
         }
 
@@ -127,6 +128,95 @@ public class UserServiceImpl implements UserService {
         }catch (Exception e){
             log.error("Error deleting user: {}", e.getMessage());
             return util.exceptionResponse("Error deleting user", e);
+        }
+    }
+
+    @Override
+    public GeneralResponse getByEmail(String email) {
+        log.info("Getting user by email: {}", email);
+        Optional<User> user = repository.findByPasiveIsFalseAndEmail(email);
+        if (user.isEmpty()) {
+            log.info("User not found");
+            return util.errorResponse("User not found");
+        }
+        log.info("User with email: {} found successfully", email);
+        return util.successResponse("User found successfully", mapper.toUserLimDTO(user.get()));
+    }
+
+    @Override
+    public GeneralResponse getByPhone(String phone) {
+        log.info("Getting user by phone: {}", phone);
+        Optional<User> user = repository.findByPasiveIsFalseAndPhone(phone);
+        if (user.isEmpty()) {
+            log.info("User not found");
+            return util.errorResponse("User not found");
+        }
+        log.info("User with phone: {} found successfully", phone);
+        return util.successResponse("User found successfully", mapper.toUserLimDTO(user.get()));
+    }
+
+    @Override
+    public GeneralResponse getById(Integer id) {
+        log.info("Getting user by id: {}", id);
+        Optional<User> user = repository.findByPasiveIsFalseAndId(id);
+        if (user.isEmpty()) {
+            log.info("User not found");
+            return util.errorResponse("User not found");
+        }
+        log.info("User with id: {} found successfully", id);
+        return util.successResponse("User found successfully", mapper.toUserLimDTO(user.get()));
+    }
+
+    @Override
+    public GeneralResponse addOrRemoveRoleToUser(Boolean add, UserRoleDTO form){
+        log.info("Adding role to user");
+
+        Optional<User> user = repository.findByPasiveIsFalseAndId(form.getIdUser());
+        if (user.isEmpty()) {
+            log.info("User not found");
+            return util.errorResponse("User not found");
+        }
+
+        var roleName = "ROLE_" + form.getRoleName().toUpperCase();
+        Optional<Role> role = roleRepository.findByName(roleName);
+        if (role.isEmpty()) {
+            log.info("Role not found");
+            return util.errorResponse("Role not found");
+        }
+
+        if (Boolean.TRUE.equals(add)){
+            if (user.get().getRoles().contains(role.get())){
+                log.info("The user already has the role");
+                return util.errorResponse("The user already has the role");
+            }
+
+            Set<Role> roles = user.get().getRoles();
+            roles.add(role.get());
+            user.get().setRoles(roles);
+            user.get().setUpdatedByIp(util.getClientIp());
+        }
+
+        if (Boolean.FALSE.equals(add)){
+            if (!user.get().getRoles().contains(role.get())){
+                log.info("The user does not have the role");
+                return util.errorResponse("The user does not have the role");
+            }
+
+            Set<Role> roles = user.get().getRoles();
+            roles.remove(role.get());
+            user.get().setRoles(roles);
+            user.get().setUpdatedByIp(util.getClientIp());
+        }
+
+
+        try {
+            repository.save(user.get());
+            log.info("Role added or removed to user successfully");
+            String message = Boolean.TRUE.equals(add) ? "Role added to user successfully" : "Role removed to user successfully";
+            return util.successResponse(message, null);
+        }catch (Exception e){
+            log.error("Error adding role to user: {}", e.getMessage());
+            return util.exceptionResponse("Error adding role to user", e);
         }
     }
 }

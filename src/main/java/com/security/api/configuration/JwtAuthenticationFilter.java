@@ -70,6 +70,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userEmailOrPhone != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.repository.findById(Integer.parseInt(userEmailOrPhone))
                     .orElseThrow(() -> new RuntimeException("User not found"));
+            /**
+             * @comment: check if user.getRoles() is empty,
+             * in case of empty, then user is not authorized
+             */
+            if (userDetails.getAuthorities().isEmpty()){
+                response.setContentType(applicationJson);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{ \"error_roles\": \"User has no roles\" }");
+                response.getWriter().flush();
+                response.getWriter().close();
+                return;
+            }
 
             /**
              * @comment: check if user is enabled,

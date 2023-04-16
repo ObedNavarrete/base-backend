@@ -1,6 +1,7 @@
 package com.security.api.controller;
 
 import com.security.api.dto.UserDTO;
+import com.security.api.dto.UserRoleDTO;
 import com.security.api.service.UserService;
 import com.security.api.util.GeneralResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,5 +38,27 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<GeneralResponse> delete(@PathVariable Integer id) {
         return ResponseEntity.ok(userService.delete(id));
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<GeneralResponse> getByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(userService.getByEmail(email));
+    }
+
+    @GetMapping("/phone")
+    public ResponseEntity<GeneralResponse> getByPhone(@RequestParam String phone) {
+        return ResponseEntity.ok(userService.getByPhone(phone));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GeneralResponse> getById(@PathVariable Integer id) {
+        return ResponseEntity.ok(userService.getById(id));
+    }
+
+    @PostMapping("/role")
+    public ResponseEntity<GeneralResponse> addOrRemoveRoleToUser(
+            @RequestParam(required = false, defaultValue = "true") Boolean add,
+            @RequestBody @Valid UserRoleDTO form) {
+        return ResponseEntity.ok(userService.addOrRemoveRoleToUser(add, form));
     }
 }
