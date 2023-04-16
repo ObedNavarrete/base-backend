@@ -84,7 +84,6 @@ public class Utilities {
             ip = request.getHeader("HTTP_CLIENT_IP");
         }
 
-        // devolver solo una ip en caso de que venga una lista
         if (ip != null && ip.contains(",")) {
             ip = ip.split(",")[0];
         }

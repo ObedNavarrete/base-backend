@@ -75,7 +75,16 @@ public class AuthenticationService {
         }
 
         var user = us.get();
-        var uop = user.getPhone() != null ? user.getPhone() : user.getEmail() != null ? user.getEmail() : "";
+        var emailOrPhone = user.getEmail() != null ? user.getEmail() : user.getPhone();
+        var uop = emailOrPhone != null ? emailOrPhone : "";
+
+        if (user.getRoles().isEmpty()) {
+            return AuthenticationResponse.builder()
+                    .accessToken(null)
+                    .refreshToken(null)
+                    .error("User has no roles")
+                    .build();
+        }
 
         Map<String, Object> claims = Map.of(
                 "roles", user.getRoles().stream().map(Role::getName).toArray(),
