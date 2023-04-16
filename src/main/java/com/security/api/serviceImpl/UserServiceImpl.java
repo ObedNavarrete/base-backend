@@ -27,21 +27,18 @@ public class UserServiceImpl implements UserService {
     private final UserMapper mapper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final Utilities utilities;
+    private final Utilities util;
 
     @Override
     public GeneralResponse findAll(){
         log.info("Getting all users");
         try {
             List<User> users = repository.findAll();
-            if (users.isEmpty())
-                return utilities.errorResponse("No users found"
-                );
-
-            return utilities.successResponse("Users found successfully", mapper.toUserLimDTO(users));
+            if (users.isEmpty()) return util.errorResponse("No users found");
+            return util.successResponse("Users found successfully", mapper.toUserLimDTO(users));
         }catch (Exception e){
             log.error("Error getting users: {}", e.getMessage());
-            return utilities.exceptionResponse("Error getting users", e);
+            return util.exceptionResponse("Error getting users", e);
         }
     }
 
@@ -49,10 +46,10 @@ public class UserServiceImpl implements UserService {
     public GeneralResponse save(UserDTO user, String roleName) {
         log.info("Saving user");
         if (Boolean.TRUE.equals(repository.existsByEmail(user.getEmail()))) {
-            return utilities.errorResponse("The email is already in use, please use another one");
+            return util.errorResponse("The email is already in use, please use another one");
         }
         if (Boolean.TRUE.equals(repository.existsByPhone(user.getPhone()))) {
-            return utilities.errorResponse("The phone is already in use, please use another one");
+            return util.errorResponse("The phone is already in use, please use another one");
         }
         roleName = "ROLE_" + roleName.toUpperCase();
 
@@ -60,21 +57,21 @@ public class UserServiceImpl implements UserService {
         Optional<Role> role = roleRepository.findByName(roleName);
 
         if (role.isEmpty()) {
-            return utilities.errorResponse("Role not found");
+            return util.errorResponse("Role not found");
         }
         Set<Role> roles = new HashSet<>();
         roles.add(role.get());
 
         userToSave.setRoles(roles);
-        userToSave.setCreatedByIp(utilities.getClientIp());
+        userToSave.setCreatedByIp(util.getClientIp());
         userToSave.setPassword(passwordEncoder.encode(user.getPassword()));
 
         try {
             repository.save(userToSave);
-            return utilities.successResponse("User saved successfully", null);
+            return util.successResponse("User saved successfully", null);
         }catch (Exception e){
             log.error("Error saving user: {}", e.getMessage());
-            return utilities.exceptionResponse("Error saving user", e);
+            return util.exceptionResponse("Error saving user", e);
         }
     }
 
@@ -83,31 +80,32 @@ public class UserServiceImpl implements UserService {
         log.info("Updating user");
         if (Boolean.TRUE.equals(repository.existsByEmailAndIdNot(user.getEmail(), id))) {
             log.info("The email is already in use");
-            return utilities.errorResponse("The email is already in use");
+            return util.errorResponse("The email is already in use");
         }
         if (Boolean.TRUE.equals(repository.existsByPhoneAndIdNot(user.getPhone(), id))) {
             log.info("The phone is already in use");
-            return utilities.errorResponse("The phone is already in use");
+            return util.errorResponse("The phone is already in use");
         }
 
         Optional<User> userToUpdate = repository.findById(id);
         if (userToUpdate.isEmpty()) {
-            log.info("User not found");
-            return utilities.errorResponse("User not found");
+            log.info("The user has not been found");
+            return util.errorResponse("The user has not been found");
         }
 
         userToUpdate.get().setEmail(user.getEmail());
         userToUpdate.get().setPhone(user.getPhone());
         userToUpdate.get().setName(user.getName());
         userToUpdate.get().setEnabled(user.getEnabled());
-        userToUpdate.get().setUpdatedByIp(utilities.getClientIp());
+        userToUpdate.get().setUpdatedByIp(util.getClientIp());
 
         try {
             repository.save(userToUpdate.get());
-            return utilities.successResponse("User updated successfully", null);
+            log.info("User updated successfully");
+            return util.successResponse("User updated successfully", null);
         }catch (Exception e){
             log.error("Error updating user: {}", e.getMessage());
-            return utilities.exceptionResponse("Error updating user", e);
+            return util.exceptionResponse("Error updating user", e);
         }
     }
 
@@ -117,18 +115,18 @@ public class UserServiceImpl implements UserService {
         Optional<User> userToDelete = repository.findByPasiveIsFalseAndId(id);
         if (userToDelete.isEmpty()) {
             log.info("User not found");
-            return utilities.errorResponse("User not found");
+            return util.errorResponse("User not found");
         }
 
         try {
             userToDelete.get().setPasive(true);
-            userToDelete.get().setUpdatedByIp(utilities.getClientIp());
+            userToDelete.get().setUpdatedByIp(util.getClientIp());
             repository.save(userToDelete.get());
             log.info("User deleted successfully");
-            return utilities.successResponse("User deleted successfully", null);
+            return util.successResponse("User deleted successfully", null);
         }catch (Exception e){
             log.error("Error deleting user: {}", e.getMessage());
-            return utilities.exceptionResponse("Error deleting user", e);
+            return util.exceptionResponse("Error deleting user", e);
         }
     }
 }

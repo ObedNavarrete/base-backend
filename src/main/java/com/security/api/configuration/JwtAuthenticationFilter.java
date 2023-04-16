@@ -1,16 +1,13 @@
 package com.security.api.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.api.auth.base.UserRepository;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.security.api.util.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,12 +24,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserRepository repository;
 
-    private void writeErrorResponse(HttpServletResponse response, int status, String message) throws IOException {
-        response.setStatus(status);
-        response.setContentType("application/json");
-        response.getWriter().write(new ObjectMapper().writeValueAsString(new ErrorResponse(status, HttpStatus.valueOf(status).getReasonPhrase(), message)));
-    }
-
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -41,6 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authorizationHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmailOrPhone;
+        final String applicationJson = "application/json";
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -52,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         boolean tokenExpired;
         tokenExpired = jwtService.isTokenExpired(jwt);
         if (tokenExpired){
-            response.setContentType("application/json");
+            response.setContentType(applicationJson);
             response.setStatus(403);
             response.getWriter().write("{ \"token_expired\": \"The token has expired\" }");;
             response.getWriter().flush();
@@ -67,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
          *  in case of not containing "roles" claim, then this is a refresh token
          */
         if (!jwtService.hasClaim(jwt)) {
-            response.setContentType("application/json");
+            response.setContentType(applicationJson);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{ \"message\": \"Invalid token\" }");
             response.getWriter().flush();
@@ -84,7 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
              * is enabled in case of property "enabled" is true and "pasive" is false
              */
             if (Boolean.FALSE.equals((userDetails.isEnabled()))) {
-                response.setContentType("application/json");
+                response.setContentType(applicationJson);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("{ \"message\": \"User is disabled\" }");
                 response.getWriter().flush();

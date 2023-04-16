@@ -5,6 +5,7 @@ import com.security.api.configuration.JwtService;
 import com.security.api.auth.base.Role;
 import com.security.api.auth.base.RoleRepository;
 import com.security.api.auth.base.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -74,12 +75,13 @@ public class AuthenticationService {
         }
 
         var user = us.get();
+        var uop = user.getPhone() != null ? user.getPhone() : user.getEmail() != null ? user.getEmail() : "";
 
         Map<String, Object> claims = Map.of(
                 "roles", user.getRoles().stream().map(Role::getName).toArray(),
                 "id", user.getId(),
                 "name", user.getName() != null ? user.getName() : "",
-                "emailOrPhone", user.getPhone() != null ? user.getPhone() : user.getEmail() != null ? user.getEmail() : ""
+                "emailOrPhone", uop
         );
 
         var jwtToken = jwtService.generateToken(claims, user);
@@ -93,26 +95,30 @@ public class AuthenticationService {
 
     // Refresh token
     public AuthenticationResponse refresh(String token) {
-        var subject = jwtService.extractUsername(token);
-        var user = repository.findById(Integer.parseInt(subject))
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        try {
+            var subject = jwtService.extractUsername(token);
 
-        // Validate token
+            var user = repository.findById(Integer.parseInt(subject))
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Map<String, Object> claims = Map.of(
-                "roles", user.getRoles().stream().map(Role::getName).toArray(),
-                "id", user.getId(),
-                "name", user.getName() != null ? user.getName() : "Obed",
-                "phone", user.getPhone() != null ? user.getPhone() : "123456789",
-                "email", user.getEmail() != null ? user.getEmail() : "nd@gmail"
-        );
+            Map<String, Object> claims = Map.of(
+                    "roles", user.getRoles().stream().map(Role::getName).toArray(),
+                    "id", user.getId(),
+                    "name", user.getName() != null ? user.getName() : "Obed",
+                    "phone", user.getPhone() != null ? user.getPhone() : "123456789",
+                    "email", user.getEmail() != null ? user.getEmail() : "nd@gmail"
+            );
 
-        var jwtToken = jwtService.generateToken(claims, user);
-        var refreshToken = jwtService.generateRefreshToken(user.getId().toString());
+            var jwtToken = jwtService.generateToken(claims, user);
+            var refreshToken = jwtService.generateRefreshToken(user.getId().toString());
 
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .build();
+            return AuthenticationResponse.builder()
+                    .accessToken(jwtToken)
+                    .refreshToken(refreshToken)
+                    .build();
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw new BadCredentialsException("The refresh token is invalid");
+        }
     }
 }
