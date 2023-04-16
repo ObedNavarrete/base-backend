@@ -17,12 +17,12 @@ public class UserLimDTO {
 
     private String[] rolesName;
     public String[] getRolesName() {
-        String[] rolesName = new String[roles.size()];
+        String[] rolesN = new String[roles.size()];
         int i = 0;
         for (RoleDTO role : roles) {
-            rolesName[i] = role.getName();
+            rolesN[i] = role.getName();
             i++;
         }
-        return rolesName;
+        return rolesN;
     }
 }

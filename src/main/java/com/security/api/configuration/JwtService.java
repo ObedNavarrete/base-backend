@@ -22,8 +22,12 @@ public class JwtService {
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        try {
+            final Claims claims = extractAllClaims(token);
+            return claimsResolver.apply(claims);
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredJwtException(null, null, "Refresh token expired");
+        }
     }
 
     public String generateToken(Map<String, Object> claims, UserDetails userDetails) {

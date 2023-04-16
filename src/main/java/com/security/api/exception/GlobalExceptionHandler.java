@@ -21,6 +21,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -53,12 +54,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<GeneralResponse> handleException(BadCredentialsException e) {
+        String comment = e.getMessage();
+        comment = Objects.requireNonNullElse(comment, "Your credentials are incorrect");
+        String message = "BAD_CREDENTIALS";
+        if (!comment.equals("Bad credentials")) {
+            message = "REFRESH_TOKEN_EXPIRED";
+        }
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(GeneralResponse.builder()
                         .status("401")
-                        .message("Your credentials are incorrect")
+                        .message(message)
                         .data(null)
-                        .comment("Unauthorized")
+                        .comment(comment)
                         .build());
     }
 
@@ -265,6 +273,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.ok(utilities.errorResponse(ex.getMessage()));
     }
 
+    @Override
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         return ResponseEntity.ok(utilities.errorResponse(ex.getMessage()));
     }

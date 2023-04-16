@@ -18,6 +18,7 @@ import javax.validation.Valid;
 public class UserController {
     private final UserService userService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<GeneralResponse> findAll() {
         return ResponseEntity.ok(userService.findAll());
