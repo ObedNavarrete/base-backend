@@ -2,15 +2,15 @@ package com.security.api.exception;
 
 import com.security.api.util.GeneralResponse;
 import com.security.api.util.Utilities;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,95 +28,205 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private final Utilities utilities = new Utilities();
-    @ExceptionHandler(Exception.class)
-    public GeneralResponse handleException(Exception e) {
-        return utilities.exceptionResponse("Error", e);
-    }
 
     @ExceptionHandler(NullPointerException.class)
-    public GeneralResponse handleException(NullPointerException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(NullPointerException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Null pointer exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public GeneralResponse handleException(IllegalArgumentException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Illegal argument exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<GeneralResponse> handleException(BadCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(GeneralResponse.builder()
+                        .status("401")
+                        .message("Your credentials are incorrect")
+                        .data(null)
+                        .comment("Unauthorized")
+                        .build());
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public GeneralResponse handleException(IllegalStateException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(IllegalStateException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Illegal state exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(UnsupportedOperationException.class)
-    public GeneralResponse handleException(UnsupportedOperationException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(UnsupportedOperationException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Unsupported operation exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(NoSuchFieldException.class)
-    public GeneralResponse handleException(NoSuchFieldException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(NoSuchFieldException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("No such field exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(NoSuchMethodException.class)
-    public GeneralResponse handleException(NoSuchMethodException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(NoSuchMethodException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("No such method exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(NoSuchFieldError.class)
-    public GeneralResponse handleException(NoSuchFieldError e) {
-        return utilities.errorResponse("No such field error " + e.getMessage());
+    public ResponseEntity<GeneralResponse> handleException(NoSuchFieldError e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("No such field error")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(NoSuchMethodError.class)
-    public GeneralResponse handleException(NoSuchMethodError e) {
+    public ResponseEntity<GeneralResponse> handleException(NoSuchMethodError e) {
         // No such method error to exception
-        return utilities.errorResponse("No such method error " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("No such method error")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(NoClassDefFoundError.class)
-    public GeneralResponse handleException(NoClassDefFoundError e) {
-        return utilities.errorResponse("No class definition found error " + e.getMessage());
+    public ResponseEntity<GeneralResponse> handleException(NoClassDefFoundError e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("No class definition found error")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(ClassNotFoundException.class)
-    public GeneralResponse handleException(ClassNotFoundException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(ClassNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Class not found exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(ClassCastException.class)
-    public GeneralResponse handleException(ClassCastException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(ClassCastException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Class cast exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(ArithmeticException.class)
-    public GeneralResponse handleException(ArithmeticException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(ArithmeticException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Arithmetic exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(ArrayIndexOutOfBoundsException.class)
-    public GeneralResponse handleException(ArrayIndexOutOfBoundsException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(ArrayIndexOutOfBoundsException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Array index out of bounds exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(ArrayStoreException.class)
-    public GeneralResponse handleException(InterruptedException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(InterruptedException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Array store exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(InstantiationException.class)
-    public GeneralResponse handleException(InstantiationException e) {
-        return utilities.exceptionResponse("Error", e);
+    public ResponseEntity<GeneralResponse> handleException(InstantiationException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Instantiation exception")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(InternalError.class)
-    public GeneralResponse handleException(InternalError e) {
-        return utilities.errorResponse("Internal error");
+    public ResponseEntity<GeneralResponse> handleException(InternalError e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(GeneralResponse.builder()
+                        .status("500")
+                        .message("Internal error")
+                        .data(null)
+                        .comment("Internal server error")
+                        .build());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public final ResponseEntity<GeneralResponse> handleAccessDeniedException(Exception ex, WebRequest request) {
-        return ResponseEntity.status(401).body(utilities.exceptionResponse("Unauthorized", ex));
+        return ResponseEntity.status(401).body(
+                GeneralResponse.builder()
+                        .status("401")
+                        .message("You don't have permission to access this resource")
+                        .data(null)
+                        .comment("Access denied")
+                        .build()
+        );
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
@@ -133,32 +243,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(400).body(utilities.errorResponse(message));
     }
 
-    @Override
-    protected ResponseEntity<Object> handleExceptionInternal(
-            Exception ex,
-            @Nullable Object body,
-            HttpHeaders headers,
-            HttpStatusCode statusCode,
-            WebRequest request) {
-        // Personalize handleHttpRequestMethodNotSupported
-        return ResponseEntity.badRequest().body(utilities.errorResponse(ex.getMessage()));
-    }
-    /*@Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(
-            MissingServletRequestParameterException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
-        return ResponseEntity.ok(utilities.errorResponse(ex.getMessage()));
+    @ExceptionHandler(value = {ExpiredJwtException.class})
+    public ResponseEntity<GeneralResponse> handleExpiredJwtException(ExpiredJwtException ex) {
+        return ResponseEntity.status(401).body(utilities.exceptionResponse("Token expired", ex));
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
-            HttpRequestMethodNotSupportedException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
-        String comment ="El método " + ex.getMethod() + " no es sportado ... use el método " + ex.getSupportedHttpMethods();
-        return ResponseEntity.ok(utilities.errorResponse(comment));
-    }*/
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex, HttpHeaders headers,
+            HttpStatus status, WebRequest request) {
+
+        String comentario = ex.getBindingResult().getFieldErrors().stream()
+                .map(x -> "FATAL ERROR: Column '" + x.getField() + "' => " + x.getDefaultMessage().toLowerCase(Locale.ROOT))
+                .collect(Collectors.joining(", "));
+
+        return ResponseEntity.ok(utilities.errorResponse(comentario));
+    }
+
+    @Override
+    public ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return ResponseEntity.ok(utilities.errorResponse(ex.getMessage()));
+    }
+
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return ResponseEntity.ok(utilities.errorResponse(ex.getMessage()));
+    }
 }

@@ -1,9 +1,9 @@
 package com.security.api.serviceImpl;
 
-import com.security.api.configSecurity.Role;
-import com.security.api.configSecurity.RoleRepository;
-import com.security.api.configSecurity.User;
-import com.security.api.configSecurity.UserRepository;
+import com.security.api.auth.base.Role;
+import com.security.api.auth.base.RoleRepository;
+import com.security.api.auth.base.User;
+import com.security.api.auth.base.UserRepository;
 import com.security.api.dto.UserDTO;
 import com.security.api.mapper.UserMapper;
 import com.security.api.service.UserService;

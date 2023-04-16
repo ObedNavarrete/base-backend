@@ -1,10 +1,7 @@
 package com.security.api.dto;
 
-import com.security.api.configSecurity.Role;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
-
-import java.util.Set;
 
 @Data
 public class UserDTO {

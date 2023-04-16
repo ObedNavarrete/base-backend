@@ -1,6 +1,6 @@
 package com.security.api.mapper;
 
-import com.security.api.configSecurity.User;
+import com.security.api.auth.base.User;
 import com.security.api.dto.UserDTO;
 import com.security.api.dto.UserLimDTO;
 import org.mapstruct.Mapper;

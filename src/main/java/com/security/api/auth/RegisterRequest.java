@@ -1,6 +1,6 @@
 package com.security.api.auth;
 
-import com.security.api.configSecurity.Role;
+import com.security.api.auth.base.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,7 +1,7 @@
 package com.security.api.audit;
 
-import com.security.api.configSecurity.User;
-import jakarta.persistence.*;
+import com.security.api.auth.base.User;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;

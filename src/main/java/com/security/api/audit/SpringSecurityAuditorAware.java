@@ -1,9 +1,8 @@
 package com.security.api.audit;
 
-import com.security.api.configSecurity.User;
-import com.security.api.configSecurity.UserRepository;
-import io.micrometer.common.util.StringUtils;
-import jakarta.servlet.http.HttpServletRequest;
+import com.security.api.auth.base.User;
+import com.security.api.auth.base.UserRepository;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;

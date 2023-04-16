@@ -1,7 +1,7 @@
-package com.security.api.configSecurity;
+package com.security.api.auth.base;
 
 import com.security.api.audit.AuditableEntity;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

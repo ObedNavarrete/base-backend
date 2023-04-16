@@ -1,6 +1,6 @@
 package com.security.api.util;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.Data;
 import lombok.experimental.Delegate;
 

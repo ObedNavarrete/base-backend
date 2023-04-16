@@ -1,11 +1,13 @@
 package com.security.api.auth;
 
+import com.security.api.auth.base.User;
 import com.security.api.configuration.JwtService;
-import com.security.api.configSecurity.Role;
-import com.security.api.configSecurity.RoleRepository;
-import com.security.api.configSecurity.UserRepository;
+import com.security.api.auth.base.Role;
+import com.security.api.auth.base.RoleRepository;
+import com.security.api.auth.base.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,7 +39,7 @@ public class AuthenticationService {
         roles.add(r1);
         roles.add(r2);
 
-        var user = com.security.api.configSecurity.User.builder()
+        var user = User.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
                 .email(request.getEmail())
@@ -54,18 +56,24 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmailOrPhone(),
-                        request.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmailOrPhone(),
+                            request.getPassword()
+                    )
+            );
+        } catch (Exception e) {
+            throw new BadCredentialsException("Invalid username or password");
+        }
 
-        var user = repository.findByEmailOrPhone(request.getEmailOrPhone(), request.getEmailOrPhone())
-                .orElseThrow(
-                        // response json Body with bad credentials
-                        () -> new UsernameNotFoundException("Bad credentials")
-                );
+        var us = repository.findByEmailOrPhone(request.getEmailOrPhone(), request.getEmailOrPhone());
+
+        if (us.isEmpty()) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        var user = us.get();
 
         Map<String, Object> claims = Map.of(
                 "roles", user.getRoles().stream().map(Role::getName).toArray(),

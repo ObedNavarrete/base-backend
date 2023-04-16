@@ -1,8 +1,8 @@
 package com.security.api;
 
-import com.security.api.configSecurity.User;
+import com.security.api.auth.base.User;
 import com.security.api.audit.SpringSecurityAuditorAware;
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;

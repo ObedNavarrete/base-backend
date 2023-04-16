@@ -1,6 +1,6 @@
-package com.security.api.configSecurity;
+package com.security.api.auth.base;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 
 @Getter @Setter
