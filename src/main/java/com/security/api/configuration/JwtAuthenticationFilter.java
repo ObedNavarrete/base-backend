@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String authorizationHeader = request.getHeader("Authorization");
         final String jwt;
-        final String userEmailOrPhone;
+        final String idString;
         final String applicationJson = "application/json";
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        userEmailOrPhone = jwtService.extractUsername(jwt);
+        idString = jwtService.extractUsername(jwt);
 
         /**
          *  @comment: jwtService.hasClaim(jwt) is true if contains "roles" claim, false otherwise
@@ -67,9 +67,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (userEmailOrPhone != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.repository.findById(Integer.parseInt(userEmailOrPhone))
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+        if (idString != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            int idInt = Integer.parseInt(idString);
+            UserDetails userDetails = this.repository.findByPasiveIsFalseAndId(idInt)
+                    .orElse(null);
+
+            if (userDetails == null) {
+                response.setContentType(applicationJson);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{ \"message\": \"El status del usuario ha cambiado\" }");
+                response.getWriter().flush();
+                response.getWriter().close();
+                return;
+            }
+
             /**
              * @comment: check if user.getRoles() is empty,
              * in case of empty, then user is not authorized

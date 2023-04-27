@@ -56,10 +56,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<GeneralResponse> handleException(BadCredentialsException e) {
         String comment = e.getMessage();
         comment = Objects.requireNonNullElse(comment, "Your credentials are incorrect");
-        String message = "BAD_CREDENTIALS";
-        if (!comment.equals("Bad credentials")) {
-            message = "REFRESH_TOKEN_EXPIRED";
-        }
+        String message = "error";
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(GeneralResponse.builder()
