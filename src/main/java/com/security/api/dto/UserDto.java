@@ -1,20 +1,16 @@
 package com.security.api.dto;
 
+import com.security.api.custom.Phone;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
-public class UserRecords {
-    public record UserObject(
-            Integer id, @NotBlank String name,
-            @NotBlank
-            @Pattern(regexp = "^[0-9]*$", message = "The phone must be numeric")
-            @Size(min = 8, max = 8, message = "The phone must be 8 digits")
-            String phone, @Email String email, Boolean enabled, @NotBlank String password) {
+public class UserDto {
+    public record User(
+            Integer id, @NotBlank String name, @Phone String phone, @Email String email,
+            Boolean enabled, @NotBlank String password) {
     }
 
-    public record UserLimitedObject(Integer id, String name, String phone, String email, Boolean enabled, String[] rolesName) {
+    public record UserLimited(Integer id, String name, String phone, String email, Boolean enabled, String[] rolesName) {
         @Override
         public String toString() {
             return "{" +
@@ -29,7 +25,7 @@ public class UserRecords {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof UserLimitedObject user) {
+            if (obj instanceof UserLimited user) {
                 return this.id.equals(user.id);
             }
             return false;
@@ -41,6 +37,6 @@ public class UserRecords {
         }
     }
 
-    public record UserRoleObject(Integer idUser, String roleName) {
+    public record UserRole(Integer idUser, String roleName) {
     }
 }

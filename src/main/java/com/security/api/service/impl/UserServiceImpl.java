@@ -1,11 +1,11 @@
 package com.security.api.service.impl;
 
-import com.security.api.dto.UserRecords;
+import com.security.api.dto.UserDto;
 import com.security.api.mapper.UserMapper;
+import com.security.api.model.entity.User;
 import com.security.api.util.GlobalRecords;
 import com.security.api.model.entity.Role;
 import com.security.api.model.repository.RoleRepository;
-import com.security.api.model.entity.User;
 import com.security.api.model.repository.UserRepository;
 import com.security.api.service.UserService;
 import com.security.api.util.Utilities;
@@ -24,8 +24,8 @@ import java.util.Set;
 import static com.security.api.util.ErrorCodes.RESOURCE_NOT_FOUND;
 import static com.security.api.util.ErrorCodes.UNIQUE_CONSTRAINT_VIOLATION;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
             if (users.isEmpty()) {
                 return util.response(true, "No users found", null);
             }
-            return util.response(true, "Users found successfully", userMapper.toUserLimitedRecords(users));
+            return util.response(true, "Users found successfully", userMapper.toUserLimited(users));
         } catch (Exception e) {
             log.error("Error getting users: {}", e.getMessage());
             return util.exceptionResponse("Error getting users", e);
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GlobalRecords.ApiResponse save(UserRecords.UserObject user, String roleName) {
+    public GlobalRecords.ApiResponse save(UserDto.User user, String roleName) {
         log.info("Saving user");
         if (Boolean.TRUE.equals(repository.existsByEmail(user.email()))) {
             this.util.throwCustomException(
@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GlobalRecords.ApiResponse update(UserRecords.UserObject user, Integer id) {
+    public GlobalRecords.ApiResponse update(UserDto.User user, Integer id) {
         log.info("user {} is trying to update user with id: {}", this.util.getLoggedUser().getId(), id);
         if (!Objects.equals(this.util.getLoggedUser().getId(), id)){
             this.util.verifyIdentity("update the user");
@@ -173,7 +173,7 @@ public class UserServiceImpl implements UserService {
             if (!Objects.equals(this.util.getLoggedUser().getId(), user.get().getId())){
                 this.util.verifyIdentity("get by email");
             }
-            return util.response(true, "The user has been found successfully", userMapper.toUserLimitedRecord(user.get()));
+            return util.response(true, "The user has been found successfully", userMapper.toUserLimited(user.get()));
         }
 
         log.info("On getByEmail method, user not found");
@@ -194,7 +194,7 @@ public class UserServiceImpl implements UserService {
             if (!Objects.equals(this.util.getLoggedUser().getId(), user.get().getId())){
                 this.util.verifyIdentity("get by phone");
             }
-            return util.response(true, "The user has been found successfully", userMapper.toUserLimitedRecord(user.get()));
+            return util.response(true, "The user has been found successfully", userMapper.toUserLimited(user.get()));
         }
 
         log.info("On getByPhone method, user not found");
@@ -213,7 +213,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = repository.findByPassiveIsFalseAndId(id);
         if (user.isPresent()) {
             log.info("User with id: {} found successfully", id);
-            return util.response(true, "User found successfully", userMapper.toUserLimitedRecord(user.get()));
+            return util.response(true, "User found successfully", userMapper.toUserLimited(user.get()));
         }
 
         this.util.throwCustomException(
@@ -223,7 +223,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GlobalRecords.ApiResponse addOrRemoveRoleToUser(Boolean add, UserRecords.UserRoleObject form) {
+    public GlobalRecords.ApiResponse addOrRemoveRoleToUser(Boolean add, UserDto.UserRole form) {
         log.info("Adding role to user");
         Optional<User> user = repository.findByPassiveIsFalseAndId(form.idUser());
         Optional<Role> role = roleRepository.findByName(this.getRoleName(form.roleName()));
