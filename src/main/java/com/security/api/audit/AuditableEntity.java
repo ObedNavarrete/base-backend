@@ -1,9 +1,16 @@
 package com.security.api.audit;
 
-import com.security.api.auth.base.User;
-import javax.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import com.security.api.model.entity.User;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -13,11 +20,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-@EntityListeners(AuditingEntityListener.class)
+@Data
 @MappedSuperclass
-@Getter @Setter
+@EntityListeners(AuditingEntityListener.class)
 public abstract class AuditableEntity {
-    protected boolean pasive = false;
+    protected boolean passive = false;
 
     @CreatedBy
     @ManyToOne(fetch = FetchType.LAZY)

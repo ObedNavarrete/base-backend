@@ -1,22 +1,37 @@
-package com.security.api.auth.base;
+package com.security.api.model.entity;
 
 import com.security.api.audit.AuditableEntity;
-import javax.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter @Setter
-@Builder @Entity
+@Getter
+@Setter
+@Builder
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "_user")
-@SequenceGenerator(name = "user_id_seq", sequenceName = "user_id_seq", allocationSize = 1)
+@SequenceGenerator(name = "user_id_seq", sequenceName = "_user_id_seq", allocationSize = 1)
 public class User extends AuditableEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
@@ -32,6 +47,18 @@ public class User extends AuditableEntity implements UserDetails {
             joinColumns = @JoinColumn(name = "id_user"),
             inverseJoinColumns = @JoinColumn(name = "id_role"))
     private Set<Role> roles = new HashSet<>();
+
+    @Transient
+    private String[] rolesName;
+    public String[] getRolesName() {
+        String[] rolesN = new String[roles.size()];
+        int i = 0;
+        for (Role role : roles) {
+            rolesN[i] = role.getName();
+            i++;
+        }
+        return rolesN;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -64,6 +91,6 @@ public class User extends AuditableEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return Boolean.TRUE.equals((this.enabled) && !this.pasive);
+        return Boolean.TRUE.equals((this.enabled) && !this.passive);
     }
 }

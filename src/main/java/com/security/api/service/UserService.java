@@ -1,24 +1,23 @@
 package com.security.api.service;
 
-import com.security.api.dto.UserDTO;
-import com.security.api.dto.UserRoleDTO;
-import com.security.api.util.GeneralResponse;
+import com.security.api.dto.UserRecords;
+import com.security.api.util.GlobalRecords;
 
 public interface UserService {
 
-    GeneralResponse save(UserDTO user, String role);
+    GlobalRecords.ApiResponse save(UserRecords.UserObject user, String role);
 
-    GeneralResponse findAll();
+    GlobalRecords.ApiResponse findAll();
 
-    GeneralResponse update(UserDTO user, Integer id);
+    GlobalRecords.ApiResponse update(UserRecords.UserObject user, Integer id);
 
-    GeneralResponse delete(Integer id);
+    GlobalRecords.ApiResponse delete(Integer id);
 
-    GeneralResponse getByEmail(String email);
+    GlobalRecords.ApiResponse getByEmail(String email);
 
-    GeneralResponse getByPhone(String phone);
+    GlobalRecords.ApiResponse getByPhone(String phone);
 
-    GeneralResponse getById(Integer id);
+    GlobalRecords.ApiResponse getById(Integer id);
 
-    GeneralResponse addOrRemoveRoleToUser(Boolean add, UserRoleDTO form);
+    GlobalRecords.ApiResponse addOrRemoveRoleToUser(Boolean add, UserRecords.UserRoleObject form);
 }

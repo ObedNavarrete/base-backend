@@ -1,5 +1,6 @@
-package com.security.api.auth.base;
+package com.security.api.model.repository;
 
+import com.security.api.model.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
