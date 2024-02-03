@@ -47,7 +47,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         jwt = authorizationHeader.substring(7);
-
         boolean tokenExpired;
         tokenExpired = jwtService.isTokenExpired(jwt);
         if (tokenExpired) {

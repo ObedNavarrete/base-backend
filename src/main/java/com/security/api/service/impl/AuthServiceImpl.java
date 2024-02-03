@@ -50,10 +50,11 @@ public class AuthServiceImpl implements AuthService {
         user.setCreatedByIp(this.util.getClientIp());
         user = repository.save(user);
 
-        var accessToken = jwtService.generateToken(user);
+        var claims = this.getClaims(user);
+        var accessToken = jwtService.generateToken(claims, user);
         var refreshToken = jwtService.generateRefreshToken(user.getId().toString());
 
-        Map<String, Object> response = Map.of(
+        var response = Map.of(
                 ACCESS_TOKEN, accessToken,
                 REFRESH_TOKEN, refreshToken
         );
@@ -92,17 +93,11 @@ public class AuthServiceImpl implements AuthService {
                 );
             }
 
-            Map<String, Object> claims = Map.of(
-                    "roles", user.getRoles().stream().map(Role::getName).toArray(),
-                    "id", user.getId(),
-                    "name", user.getName() != null ? user.getName() : "",
-                    "emailOrPhone", uop
-            );
-
+            var claims = this.getClaims(user);
             var jwtToken = jwtService.generateToken(claims, user);
             var refreshToken = jwtService.generateRefreshToken(user.getId().toString());
 
-            Map<String, String> response = Map.of(
+            var response = Map.of(
                     ACCESS_TOKEN, jwtToken,
                     REFRESH_TOKEN, refreshToken
             );
@@ -133,14 +128,7 @@ public class AuthServiceImpl implements AuthService {
             return null;
         }
 
-        Map<String, Object> claims = Map.of(
-                "roles", user.getRoles().stream().map(Role::getName).toArray(),
-                "id", user.getId(),
-                "name", user.getName(),
-                "phone", user.getPhone(),
-                "email", user.getEmail()
-        );
-
+        Map<String, Object> claims = this.getClaims(user);
         if (Boolean.TRUE.equals(!user.getEnabled() || Objects.isNull(user.getRoles())) || user.getRoles().isEmpty()) {
             log.error("User {} has no roles, failed in method {}, class {}",
                     subject, "refresh", this.getClass().getName());
@@ -152,12 +140,20 @@ public class AuthServiceImpl implements AuthService {
 
         var jwtToken = jwtService.generateToken(claims, user);
         var refreshToken = jwtService.generateRefreshToken(user.getId().toString());
-
-        Map<String, String> response = Map.of(
+        var response = Map.of(
                 ACCESS_TOKEN, jwtToken,
                 REFRESH_TOKEN, refreshToken
         );
 
         return this.util.response(true, "Token refreshed", response);
+    }
+
+    private Map<String, Object> getClaims(User user) {
+        return Map.of(
+                "roles", user.getRoles().stream().map(Role::getName).toArray(),
+                "id", user.getId(),
+                "name", user.getName(),
+                "emailOrPhone", user.getEmail() != null ? user.getEmail() : user.getPhone()
+        );
     }
 }
