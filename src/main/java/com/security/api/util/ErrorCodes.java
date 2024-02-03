@@ -11,4 +11,5 @@ public class ErrorCodes {
     public static final String JWT_ERROR = "005";
     public static final String INVALID_CREDENTIALS = "006";
     public static final String ACCESS_DENIED = "007";
+    public static final String METHOD_OBJECT_VALIDATION = "008";
 }
