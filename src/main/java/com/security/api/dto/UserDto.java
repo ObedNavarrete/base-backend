@@ -1,6 +1,6 @@
 package com.security.api.dto;
 
-import com.security.api.custom.Phone;
+import com.security.api.valid.Phone;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
