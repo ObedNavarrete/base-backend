@@ -4,12 +4,14 @@ import com.security.api.service.AuthService;
 import com.security.api.util.GlobalRecords;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
@@ -23,6 +25,7 @@ public class AuthController {
     @PostMapping("/auth/login")
     public ResponseEntity<GlobalRecords.ApiResponse> login(
             @RequestBody @Valid GlobalRecords.LoginRequest request) {
+        log.atWarn().addKeyValue("message", "Login request received").addKeyValue("request", request).log("Login request received");
         return ResponseEntity.ok(service.login(request));
     }
 

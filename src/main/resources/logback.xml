@@ -1,0 +1,47 @@
+<configuration>
+    <appender name="STRUCTURED_SYNC" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeCallerData>true</includeCallerData>
+            <fieldNames>
+                <version>[ignore]</version>
+                <levelValue>[ignore]</levelValue>
+            </fieldNames>
+            <jsonGeneratorDecorator class="net.logstash.logback.decorate.CompositeJsonGeneratorDecorator">
+                <decorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
+                <decorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
+                    <defaultMask>XXXL</defaultMask>
+                    <path>password</path>
+                </decorator>
+            </jsonGeneratorDecorator>
+        </encoder>
+    </appender>
+
+    <!-- Asynchronous STRUCTURED appender -->
+    <appender name="STRUCTURED" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="STRUCTURED_SYNC"/>
+    </appender>
+
+    <appender name="FILE_SYNC" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/app.log</file>
+        <encoder>
+            <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Asynchronous FILE appender -->
+    <appender name="FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="FILE_SYNC"/>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="com.security.api" level="INFO" additivity="false">
+        <appender-ref ref="STRUCTURED"/>
+    </logger>
+</configuration>

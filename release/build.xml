@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="api.release" default="release" basedir=".">
+    <property environment="sys"/>
+    <property name="release.dir" location="${ant.file.api.release}/../target" />
+    <property name="base.dir" location="${ant.file.api.release}/.." />
+    <property name="bin.dir" location="${release.dir}/bin" />
+    <property name="conf.dir" location="${release.dir}/conf" />
+    <property name="logs.dir" location="${release.dir}/bin/logs" />
+    <property name="checkout.dir" value="${base.dir}/checkout" />
+    <property name="api.release.version" value="0.0.1-SNAPSHOT" />
+    <property name="checkout.api.dir" value="${base.dir}/.." />
+
+    <property name="release.build.goals" value="clean install -Dmaven.test.skip=true" />
+    <condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
+        <os family="windows"/>
+    </condition>
+
+    <target name="release" depends="clean,build,copy,make-final-zip">
+        <echo>Release API</echo>
+        <delete dir="target"/>
+    </target>
+
+    <target name="clean">
+        <echo>Delete ${release.dir}</echo>
+        <delete dir="${release.dir}"/>
+        <delete dir="${release.dir}/bin"/>
+        <delete dir="${release.dir}/conf"/>
+        <delete dir="${release.dir}/bin/logs"/>
+        <delete>
+            <fileset dir="${base.dir}">
+                <include name="API-*.*" />
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="build">
+        <echo>building API in ${checkout.api.dir} and ${release.build.goals}</echo>
+        <exec failonerror="true" executable="${mvn.executable}" dir="${checkout.api.dir}">
+            <arg line="${release.build.goals}" />
+        </exec>
+        <copy overwrite="true" todir="${release.dir}/bin">
+            <fileset file="${base.dir}/../target/*.jar" />
+        </copy>
+        <copy failonerror="true" todir="${release.dir}/conf">
+            <fileset file="${base.dir}/../src/main/resources/*.properties"/>
+        </copy>
+        <copy failonerror="true" todir="${release.dir}/conf">
+            <fileset file="${base.dir}/../src/main/resources/*.xml"/>
+        </copy>
+        <copy failonerror="true" todir="${release.dir}/bin">
+            <fileset file="${base.dir}/start.sh"/>
+        </copy>
+        <replace file="${release.dir}/bin/start.sh" token="VERSION" value="${api.release.version}"/>
+    </target>
+
+    <target name="copy">
+        <mkdir dir="${release.dir}/bin" />
+        <mkdir dir="${release.dir}/conf" />
+        <mkdir dir="${release.dir}/bin/logs" />
+    </target>
+
+    <target name="set-time-stamp" unless="skip.timestamp">
+        <tstamp>
+            <format property="timestamp" pattern="yyMMddHHmm" />
+        </tstamp>
+        <echo>Timestamp: ${timestamp}</echo>
+    </target>
+
+    <target name="make-final-zip" depends="set-time-stamp">
+        <zip destfile="${base.dir}/API-${api.release.version}.zip" filesonly="false">
+            <zipfileset dir="${release.dir}" prefix="API-${api.release.version}">
+                <include name="**/*" />
+            </zipfileset>
+        </zip>
+    </target>
+</project>

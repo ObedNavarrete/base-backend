@@ -95,3 +95,23 @@ POST /auth/refresh?request={{refreshToken}}
     }
 }
 ```
+
+### Build Using Ant for Release
+```shell
+ant -f build.xml -Dapi.release.version=0.0.1-SNAPSHOT
+```
+
+### Build for get docker image
+```shell
+docker build --no-cache --build-arg VERSION=0.0.1-SNAPSHOT --tag security/api:0.0.1-SNAPSHOT .
+```
+
+### Save docker image on release
+```shell
+docker save security/api:0.0.1-SNAPSHOT | gzip > release/api-0.0.1-SNAPSHOT.tar.gz
+```
+
+### Gunzip docker image on release
+```shell
+gunzip -c release/api-0.0.1-SNAPSHOT.tar.gz | docker load
+```
