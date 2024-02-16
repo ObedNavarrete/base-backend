@@ -115,3 +115,8 @@ docker save security/api:0.0.1-SNAPSHOT | gzip > release/api-0.0.1-SNAPSHOT.tar.
 ```shell
 gunzip -c release/api-0.0.1-SNAPSHOT.tar.gz | docker load
 ```
+
+### Change log level
+```shell
+curl -i -X POST -H 'Content-Type: application/json' -d '{"configuredLevel": "DEBUG"}' http://localhost:7878/actuator/loggers/ROOT
+```
