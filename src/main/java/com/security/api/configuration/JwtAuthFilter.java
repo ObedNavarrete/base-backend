@@ -54,7 +54,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     "Token expired",
                     HttpServletResponse.SC_UNAUTHORIZED,
                     JWT_ERROR,
-                    null
+                    "The token has expired at " + jwtService.extractExpiration(jwt)
             );
 
             response.setContentType(String.valueOf(APPLICATION_JSON));

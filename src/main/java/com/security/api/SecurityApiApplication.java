@@ -11,6 +11,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class SecurityApiApplication {
     public static void main(String[] args) {
         SpringApplication.run(SecurityApiApplication.class, args);
-        log.info("The application has started");
+        log.atWarn().addKeyValue("message", "Application started").log("Application started");
     }
 }
