@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @NotBlank
 @Documented
 @Size(min = 8, max = 8, message = "The phone must be 8 digits")
-@Pattern(regexp = "^[0-9]*$", message = "The phone must be numeric")
+@Pattern(regexp = "^\\d*$", message = "The phone must be numeric")
 @Constraint(validatedBy = {})
 @Target( { ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
