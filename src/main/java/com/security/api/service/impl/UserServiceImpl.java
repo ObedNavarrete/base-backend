@@ -1,6 +1,7 @@
 package com.security.api.service.impl;
 
 import com.security.api.dto.UserDto;
+import com.security.api.exception.CustomException;
 import com.security.api.mapper.UserMapper;
 import com.security.api.model.entity.User;
 import com.security.api.util.GlobalRecords;
@@ -224,61 +225,83 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GlobalRecords.ApiResponse addOrRemoveRoleToUser(Boolean add, UserDto.UserRole form) {
-        log.info("Adding role to user");
-        Optional<User> user = repository.findByPassiveIsFalseAndId(form.idUser());
-        Optional<Role> role = roleRepository.findByName(this.getRoleName(form.roleName()));
+        log.info("Adding or removing role to/from user");
 
-        if (role.isPresent() && user.isPresent()) {
-            if (!Objects.equals(this.util.getLoggedUser().getId(), user.get().getId())){
-                this.util.verifyIdentity("add or remove role to user");
-            }
-            var userEntity = user.get();
-            var roleEntity = role.get();
-            if (Boolean.TRUE.equals(add)) {
-                if (userEntity.getRoles().contains(roleEntity)) {
-                    log.info("The user {} already has the role {}", userEntity.getId(), roleEntity.getId());
-                    this.util.throwCustomException(
-                            "The user already has the role", 400, RESOURCE_NOT_FOUND, "The user already has the role"
-                    );
-                }
+        User user = getUser(form.idUser());
+        Role role = getRole(form.roleName());
 
-                Set<Role> roles = userEntity.getRoles();
-                roles.add(roleEntity);
-                userEntity.setRoles(roles);
-                userEntity.setUpdatedByIp(util.getClientIp());
-            }
+        verifyIdentity(user);
 
-            if (Boolean.FALSE.equals(add)) {
-                if (!userEntity.getRoles().contains(roleEntity)) {
-                    log.info("The user {} does not have the role {}", userEntity.getId(), roleEntity.getId());
-                    this.util.throwCustomException(
-                            "The user does not have the role", 400, RESOURCE_NOT_FOUND, "The user does not have the role"
-                    );
-                }
-
-                Set<Role> roles = userEntity.getRoles();
-                roles.remove(roleEntity);
-                userEntity.setRoles(roles);
-                userEntity.setUpdatedByIp(util.getClientIp());
-            }
-
-            try {
-                repository.save(userEntity);
-                log.info("Role added or removed to user successfully");
-                String message = Boolean.TRUE.equals(add) ? "Role added to user successfully" : "Role removed to user successfully";
-                return this.util.response(true, message, null);
-            } catch (Exception e) {
-                log.error("Error adding role to user: {}", e.getMessage());
-                return util.exceptionResponse("Error adding role to user", e);
-            }
+        if (Boolean.TRUE.equals(add)) {
+            addRoleToUser(user, role);
+        } else if (Boolean.FALSE.equals(add)) {
+            removeRoleFromUser(user, role);
         }
 
-        log.info("On addOrRemoveRoleToUser method, role not found");
-        this.util.throwCustomException(
-                "User or role not found", 404, RESOURCE_NOT_FOUND, "The user or role has not been found, review it"
-        );
-        return null;
+        saveUser(user);
+
+        String message = Boolean.TRUE.equals(add) ? "Role added to user successfully" : "Role removed from user successfully";
+        return this.util.response(true, message, null);
     }
+
+    private User getUser(Integer userId) {
+        return repository.findByPassiveIsFalseAndId(userId)
+                .orElseThrow(() -> {
+                    log.info("User not found with id: {}", userId);
+                    GlobalRecords.ErrorObject errorObject = new GlobalRecords.ErrorObject("User not found with id", "User not found with id");
+                    return new CustomException("User not found", 404, errorObject);
+                });
+    }
+
+    private Role getRole(String roleName) {
+        return roleRepository.findByName(this.getRoleName(roleName))
+                .orElseThrow(() -> {
+                    log.info("Role not found with name: {}", roleName);
+                    GlobalRecords.ErrorObject errorObject = new GlobalRecords.ErrorObject("Role not found with name", "Role not found with name");
+                    return new CustomException("Role not found", 404, errorObject);
+                });
+    }
+
+    private void verifyIdentity(User user) {
+        if (!Objects.equals(this.util.getLoggedUser().getId(), user.getId())) {
+            this.util.verifyIdentity("add or remove role to user");
+        }
+    }
+
+    private void addRoleToUser(User user, Role role) {
+        if (user.getRoles().contains(role)) {
+            log.info("The user {} already has the role {}", user.getId(), role.getId());
+            this.util.throwCustomException(
+                    "The user already has the role", 400, RESOURCE_NOT_FOUND, "The user already has the role"
+            );
+        }
+
+        user.getRoles().add(role);
+        user.setUpdatedByIp(util.getClientIp());
+    }
+
+    private void removeRoleFromUser(User user, Role role) {
+        if (!user.getRoles().contains(role)) {
+            log.info("The user {} does not have the role {}", user.getId(), role.getId());
+            this.util.throwCustomException(
+                    "The user does not have the role", 400, RESOURCE_NOT_FOUND, "The user does not have the role"
+            );
+        }
+
+        user.getRoles().remove(role);
+        user.setUpdatedByIp(util.getClientIp());
+    }
+
+    private void saveUser(User user) {
+        try {
+            repository.save(user);
+            log.info("Role added or removed to user successfully");
+        } catch (Exception e) {
+            log.error("Error adding or removing role to user: {}", e.getMessage());
+            this.util.exceptionResponse("Error adding or removing role to user", e);
+        }
+    }
+
 
     private String getRoleName(@NotBlank String roleName) {
         return "ROLE_" + roleName.toUpperCase();

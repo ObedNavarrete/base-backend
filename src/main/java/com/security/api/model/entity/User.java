@@ -93,4 +93,18 @@ public class User extends AuditableEntity implements UserDetails {
     public boolean isEnabled() {
         return Boolean.TRUE.equals((this.enabled) && !this.passive);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+        return id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

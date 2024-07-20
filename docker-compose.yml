@@ -10,12 +10,3 @@ services:
     networks:
       - app_net
     restart: always
-
-networks:
-  app_net:
-    driver: bridge
-    enable_ipv6: true
-    ipam:
-      driver: default
-      config:
-        - subnet: 192.168.100.15/24
